@@ -171,7 +171,8 @@ license = 'http://php.net/license/'
       rm_rf  jailed_root
       mkdir_p jailed_root
       cd "src/#{language_name}-#{version}" do
-        sh("make install DESTDIR=#{jailed_root} > #{File.dirname(__FILE__)}/log/make-install.#{version}.log 2>&1")
+        sh("make install INSTALL_ROOT=#{jailed_root} > #{File.dirname(__FILE__)}/log/make-install.#{version}.log 2>&1")
+        rm_rf (Dir["#{jailed_root}/.*"] - Dir["#{jailed_root}/{.,..}"])
       end
     end
 
