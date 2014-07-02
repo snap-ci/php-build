@@ -190,6 +190,7 @@ end
         mkdir_p jailed_conf_dir_includes
 
         cp "php.ini-development", "#{jailed_conf_dir}/php.ini"
+        cp File.join(jailed_conf_dir, 'php-fpm.conf.default'), File.join(jailed_conf_dir, 'php-fpm.conf')
 
         rm_rf (Dir["#{jailed_root}/.*"] - Dir["#{jailed_root}/{.,..}"])
       end
