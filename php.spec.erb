@@ -21,6 +21,9 @@ PHP is an HTML-embedded scripting language. PHP attempts to make it easy for dev
 %defattr(-,root,root,-)
 <%= prefix %>
 
+%attr(0777,root,root) <%= prefix %>/var/log/
+%attr(0777,root,root) <%= prefix %>/var/run/
+
 %attr(0777,root,root) <%= conf_dir %>
 %attr(0777,root,root) <%= conf_dir_includes %>
 
