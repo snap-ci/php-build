@@ -1,0 +1,30 @@
+Name: php-<%= version %>
+Version: <%= version %>
+Release: <%= release %>
+Summary: PHP scripting language for creating dynamic web sites
+BuildArch: x86_64
+AutoReq: no
+AutoProv: no
+
+Group: default
+License: PHP
+Vendor: support@snap-ci.com
+URL: http://snap-ci.com
+Packager: support@snap-ci.com
+
+%description
+PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated webpages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+
+%files
+
+# default attributes for everything, owned by root
+%defattr(-,root,root,-)
+<%= prefix %>
+
+%attr(0777,root,root) <%= conf_dir %>
+%attr(0777,root,root) <%= conf_dir_includes %>
+
+%changelog
+# noop
+
+# vim: ft=eruby.spec

@@ -21,6 +21,13 @@ end
 language_name = 'php'
 license = 'http://php.net/license/'
 
+class RpmSpec < Struct.new(:version, :release, :prefix, :conf_dir, :conf_dir_includes)
+  def get_binding
+    binding
+  end
+end
+
+
 {
   '5.5.14' => {:md5sum => 'b34262d4ccbb6bef8d2cf83840625201'},
   '5.4.30' => {:md5sum => '461afd4b84778c5845b71e837776139f'},
@@ -29,6 +36,13 @@ license = 'http://php.net/license/'
   namespace version do
     release = Time.now.utc.strftime('%Y%m%d%H%M%S')
     tarball = "#{language_name}-#{version}.tar.gz"
+
+    description_string = %Q{PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated webpages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.}
+
+    jailed_root       = File.expand_path('../jailed-root', __FILE__)
+    prefix            = File.join("/opt/local/#{language_name}", version.split('.').first(2).join('.'))
+    conf_dir          = File.join(prefix, 'etc')
+    conf_dir_includes = File.join(prefix, 'etc', 'conf.d')
 
     configure_flags = %w(
       --disable-debug
@@ -117,15 +131,11 @@ license = 'http://php.net/license/'
       --without-gdbm
     )
 
-    configure_flags += %w(
-      --with-libdir=/usr/lib64
+    configure_flags += %W(
       --with-libdir=lib64
+      --with-config-file-path=#{conf_dir}
+      --with-config-file-scan-dir=#{conf_dir_includes}
     )
-
-    description_string = %Q{PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated webpages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.}
-
-    jailed_root = File.expand_path('../jailed-root', __FILE__)
-    prefix = File.join(%Q{/opt/local/#{language_name}}, version.split('.').first(2).join('.'))
 
     CLEAN.include("downloads")
     CLEAN.include("jailed-root")
@@ -164,6 +174,7 @@ license = 'http://php.net/license/'
 
       cd "src/#{language_name}-#{version}" do
         sh("make -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.#{version}.log 2>&1")
+        # sh("make test -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.test.#{version}.log 2>&1")
       end
     end
 
@@ -172,20 +183,50 @@ license = 'http://php.net/license/'
       mkdir_p jailed_root
       cd "src/#{language_name}-#{version}" do
         sh("make install INSTALL_ROOT=#{jailed_root} > #{File.dirname(__FILE__)}/log/make-install.#{version}.log 2>&1")
+        jailed_conf_dir          = File.join(jailed_root, conf_dir)
+        jailed_conf_dir_includes =  File.join(jailed_root, conf_dir_includes)
+
+        mkdir_p jailed_conf_dir
+        mkdir_p jailed_conf_dir_includes
+
+        cp "php.ini-development", "#{jailed_conf_dir}/php.ini"
+
         rm_rf (Dir["#{jailed_root}/.*"] - Dir["#{jailed_root}/{.,..}"])
       end
     end
 
-    task :fpm do
-      cd 'pkg' do
-        sh(%Q{
-             bundle exec fpm -s dir -t #{distro} --name #{language_name}-#{version} -a x86_64 --version "#{version}" -C #{jailed_root} --directories #{prefix} --verbose #{fpm_opts} --maintainer suppport@snap-ci.com --vendor suppport@snap-ci.com --url http://snap-ci.com --description "#{description_string}" --iteration #{release} --license '#{license}' .
-        })
+    task :rpm do
+      require 'erb'
+
+      ERB.new(File.read(File.expand_path('../php.spec.erb', __FILE__)), nil , '-').tap do |template|
+        File.open("/tmp/php.spec", 'w') do |f|
+          attrs = RpmSpec.new(version, release, prefix, conf_dir, conf_dir_includes)
+          f.puts(template.result(attrs.get_binding))
+        end
+        at_exit {rm_rf "/tmp/php.spec"}
       end
+
+      cd jailed_root do
+        output_dir = File.expand_path('../target-rpms', __FILE__)
+        at_exit {rm_rf output_dir}
+        puts "*** Building RPM..."
+        rpmbuild_cmd = []
+        rpmbuild_cmd << "rpmbuild /tmp/php.spec"
+        rpmbuild_cmd << "--verbose"
+        rpmbuild_cmd << "--buildroot #{jailed_root}"
+        rpmbuild_cmd << "--define '_tmppath #{jailed_root}/../rpm_tmppath'"
+        rpmbuild_cmd << "--define '_topdir #{output_dir}'"
+        rpmbuild_cmd << "--define '_rpmdir #{output_dir}'"
+        rpmbuild_cmd << "--define 'noclean 1'"
+        rpmbuild_cmd << "-bb"
+
+        sh rpmbuild_cmd.join(" ")
+      end
+      sh("mv target-rpms/x86_64/*.rpm pkg/")
     end
 
     desc "build and package #{language_name}-#{version}"
-    task :all => [:clean, :init, :download, :configure, :make, :make_install, :fpm]
+    task :all => [:clean, :init, :download, :configure, :make, :make_install, :rpm]
   end
 
   task :default => "#{version}:all"
