@@ -40,7 +40,7 @@ end
     description_string = %Q{PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated webpages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.}
 
     jailed_root       = File.expand_path('../jailed-root', __FILE__)
-    prefix            = File.join("/opt/local/#{language_name}", version.split('.').first(2).join('.'))
+    prefix            = File.join("/opt/local/#{language_name}", version)
     conf_dir          = File.join(prefix, 'etc')
     conf_dir_includes = File.join(prefix, 'etc', 'conf.d')
 
