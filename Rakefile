@@ -29,8 +29,8 @@ end
 
 
 {
-  '5.5.14' => {:md5sum => 'b34262d4ccbb6bef8d2cf83840625201'},
-  '5.4.30' => {:md5sum => '461afd4b84778c5845b71e837776139f'},
+  '5.5.15' => {:md5sum => '63b56e64e7c25b1c6dcdf778333dfa24'},
+  '5.4.31' => {:md5sum => '07985cff81820666fbf0b0c46f5d35df'},
   '5.3.28' => {:md5sum => 'eec3fb5ccb6d8c238f973d306bebb00e'},
 }.each do |version, opts|
   namespace version do
