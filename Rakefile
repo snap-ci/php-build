@@ -32,6 +32,7 @@ end
   '5.5.15' => {:md5sum => '63b56e64e7c25b1c6dcdf778333dfa24'},
   '5.4.31' => {:md5sum => '07985cff81820666fbf0b0c46f5d35df'},
   '5.3.28' => {:md5sum => 'eec3fb5ccb6d8c238f973d306bebb00e'},
+  '5.6.0RC2' => {:md5sum => '99769c4c3477168e0b96d1f228ad23fb'}
 }.each do |version, opts|
   namespace version do
     release = Time.now.utc.strftime('%Y%m%d%H%M%S')
@@ -153,7 +154,11 @@ end
 
     task :download do
       cd 'downloads' do
-        sh("curl --fail --location http://www.php.net/get/#{tarball}/from/this/mirror > #{tarball} 2>/dev/null")
+        if tarball == 'php-5.6.0RC2.tar.gz'
+          sh("curl --fail --location http://downloads.php.net/tyrael/#{tarball} > #{tarball} 2>/dev/null")
+        else
+          sh("curl --fail --location http://www.php.net/get/#{tarball}/from/this/mirror > #{tarball} 2>/dev/null")
+        end
         File.open("#{tarball}.md5sum", 'w') {|f| f.puts("#{opts[:md5sum]}  #{tarball}")}
         sh("md5sum --status --check #{tarball}.md5sum")
       end
