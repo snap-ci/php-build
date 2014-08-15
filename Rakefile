@@ -18,6 +18,10 @@ unless distro
   $stderr.puts "Don't know what distro I'm running on -- not sure if I can build!"
 end
 
+def centos7?
+  File.exist?('/etc/system-release') && File.read('/etc/system-release') =~ /centos.* 7\.0\.*/i
+end
+
 language_name = 'php'
 license = 'http://php.net/license/'
 
@@ -26,7 +30,6 @@ class RpmSpec < Struct.new(:version, :release, :prefix, :conf_dir, :conf_dir_inc
     binding
   end
 end
-
 
 {
   '5.5.15' => {:md5sum => '63b56e64e7c25b1c6dcdf778333dfa24'},
@@ -178,7 +181,12 @@ end
       num_jobs       = num_processors + 1
 
       cd "src/#{language_name}-#{version}" do
-        sh("make -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.#{version}.log 2>&1")
+        cmd = "make -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.#{version}.log 2>&1"
+        if centos7? && version == '5.3.28'
+          cmd = "export LDFLAGS='-lstdc++'; " << cmd
+        else
+
+        sh(cmd)
         # sh("make test -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.test.#{version}.log 2>&1")
       end
     end
