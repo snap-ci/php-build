@@ -184,7 +184,7 @@ end
         cmd = "make -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.#{version}.log 2>&1"
         if centos7? && version == '5.3.28'
           cmd = "export LDFLAGS='-lstdc++'; " << cmd
-        else
+        end
 
         sh(cmd)
         # sh("make test -j#{num_jobs} > #{File.dirname(__FILE__)}/log/make.test.#{version}.log 2>&1")
