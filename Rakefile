@@ -157,11 +157,7 @@ end
 
     task :download do
       cd 'downloads' do
-        if tarball == 'php-5.6.0RC2.tar.gz'
-          sh("curl --fail --location http://downloads.php.net/tyrael/#{tarball} > #{tarball} 2>/dev/null")
-        else
-          sh("curl --fail --location http://www.php.net/get/#{tarball}/from/this/mirror > #{tarball} 2>/dev/null")
-        end
+        sh("curl --fail --location http://www.php.net/get/#{tarball}/from/this/mirror > #{tarball} 2>/dev/null")
         File.open("#{tarball}.md5sum", 'w') {|f| f.puts("#{opts[:md5sum]}  #{tarball}")}
         sh("md5sum --status --check #{tarball}.md5sum")
       end
