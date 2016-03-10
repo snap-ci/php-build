@@ -2,4 +2,6 @@
 /downloads/
 /.bundle/
 /bin/
+/log/
+/pkg/
 Gemfile.lock

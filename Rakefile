@@ -38,7 +38,8 @@ end
   '5.6.3'   => {:md5sum => 'b6278e4fb74bae260a2ef2d8a430c8fc'},
   '5.6.13'  => {:md5sum => '349f183c0f8e2567772e2eb3dee84504'},
   '5.6.14'  => {:md5sum => 'ae625e0cfcfdacea3e7a70a075e47155'},
-  '5.6.15'  => {:md5sum => '4ec2fe201e24c6f65bf7bd4bac1bc880'}
+  '5.6.15'  => {:md5sum => '4ec2fe201e24c6f65bf7bd4bac1bc880'},
+  '7.0.3'   => {:md5sum => '235b1217a9ec7bee6e0bd517e3636d45'}
 }.each do |version, opts|
   namespace version do
     release = Time.now.utc.strftime('%Y%m%d%H%M%S')
