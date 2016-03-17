@@ -1,4 +1,6 @@
-This repo contains scripts needed to build deb and rpms for various versions of nodejs
+[![Build Status](https://snap-ci.com/snap-ci/php-build/branch/master/build_image)](https://snap-ci.com/snap-ci/php-build/branch/master)
+
+This repo contains scripts needed to build deb and rpms for various versions of nodejs. To report any issues, [please contact the Snap.ci support team.](https://snap-ci.com/contact-us)
 
 # CentOS/RHEL
 
